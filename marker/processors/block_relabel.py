@@ -21,7 +21,7 @@ class BlockRelabelProcessor(BaseProcessor):
     block_relabel_str: Annotated[
         str,
         "Comma-separated relabeling rules in the format '<original_label>:<new_label>:<confidence_threshold>'.",
-        "Each rule defines how blocks of a certain type should be relabeled when the confidence exceeds the threshold.",
+        "Each rule defines how blocks of a certain type should be relabeled when the confidence is below the threshold.",
         "Example: 'Table:Picture:0.85,Form:Picture:0.9'"
     ] = ""
 
@@ -67,7 +67,7 @@ class BlockRelabelProcessor(BaseProcessor):
                 block_id = BlockId(page_id=page.page_id, block_id=block.block_id, block_type=block.block_type)
                 confidence_thresh, relabel_block_type = self.block_relabel_map[block.block_type]
                 confidence = block.top_k.get(block.block_type)
-                if confidence > confidence_thresh:
+                if confidence is not None and confidence > confidence_thresh:
                     logger.debug(f"Skipping relabel for {block_id}; Confidence: {confidence} > Confidence Threshold {confidence_thresh} for re-labelling")
                     continue
 
